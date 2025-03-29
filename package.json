@@ -1,6 +1,6 @@
 {
-  "name": "emoji-search",
-  "version": "1.0.0",
+  "name": "@diqi/emoji-search",
+  "version": "0.1.0",
   "description": "A simple TypeScript package to search emojis from a JSON file.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

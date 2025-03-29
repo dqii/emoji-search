@@ -43,3 +43,6 @@ temp/
 .env
 .env.*
 !.env.example 
+
+# npmrc
+.npmrc
