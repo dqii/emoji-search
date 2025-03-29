@@ -1,6 +1,6 @@
 {
   "name": "@diqi/emoji-search",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A simple TypeScript package to search emojis from a JSON file.",
   "main": "dist/search.js",
   "types": "dist/search.d.ts",
@@ -11,12 +11,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git"
+    "url": "git+https://github.com/dqii/emoji-search.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/issues"
+    "url": "https://github.com/dqii/emoji-search/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME#readme",
+  "homepage": "https://github.com/dqii/emoji-search#readme",
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -27,7 +27,7 @@
     "search",
     "typescript"
   ],
-  "author": "Your Name or Handle",
+  "author": "Di Qi",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.12",

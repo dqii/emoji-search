@@ -5,6 +5,12 @@ describe('searchEmojis (with enriched data)', () => {
     expect(searchEmojis('')).toEqual([]);
   });
 
+  it('should find emoji without eyes', () => {
+    const results = searchEmojis(')', 10);
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    expect(results.some(e => e.emoji === '😊')).toBe(true);
+  });
+
   it('should find emoji by exact emoticon match', () => {
     const resultsP = searchEmojis(':p');
     expect(resultsP.length).toBeGreaterThan(1);

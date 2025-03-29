@@ -4,13 +4,21 @@ import allEmojisData from './emojis-expanded.json'; // Import the JSON directly
 // Characters that might be the end of a common emoticon (missing the leading ':')
 const partialEmoticonChars = new Set([')', '(', 'p', 'd', '/', '\\', 'o', '|', ']', '[']);
 
-// Assign the imported data
+// Assign the imported data and pre-compute known emoticons
 let allEmojis: EmojiData = [];
+const knownEmoticons = new Set<string>();
+const knownTextSymbolsToFilter = new Set<string>(['☺']); // U+263A
 
 // Basic validation after import
 try {
   if (Array.isArray(allEmojisData)) {
     allEmojis = allEmojisData as EmojiData;
+    // Pre-compute all known emoticons from the dataset
+    for (const emoji of allEmojis) {
+      for (const emoticon of emoji.emoticons) {
+        knownEmoticons.add(emoticon.toLowerCase());
+      }
+    }
   } else {
     console.error('Error: Imported emojis-expanded.json is not a valid JSON array.');
     allEmojis = []; // Reset to empty on invalid format
@@ -23,6 +31,7 @@ try {
 /**
  * Searches for emojis based on a query string using enriched metadata.
  * Prioritizes visual matches over text emoticons.
+ * Filters out specific text symbols if the query is an emoticon.
  * @param query The search query.
  * @param maxResults Optional limit for the number of results.
  * @returns An array of matching emojis, sorted by relevance (score).
@@ -39,6 +48,9 @@ export function searchEmojis(query: string, maxResults: number = 50): EnrichedEm
   if (lowerCaseQuery.length === 1 && partialEmoticonChars.has(lowerCaseQuery)) {
       potentialFullEmoticon = ':' + lowerCaseQuery;
   }
+
+  // Determine if the exact query is a known emoticon
+  const queryIsKnownEmoticon = knownEmoticons.has(lowerCaseQuery) || (potentialFullEmoticon && knownEmoticons.has(potentialFullEmoticon));
 
   // Use Map to store unique emojis and their highest score
   const results = new Map<string, { emoji: EnrichedEmoji, score: number }>();
@@ -93,11 +105,17 @@ export function searchEmojis(query: string, maxResults: number = 50): EnrichedEm
     // (For now, let's process all to ensure comprehensive results)
   }
 
-  // Convert map values to an array, sort by score (descending), then take top results
-  const sortedResults = Array.from(results.values())
+  // Convert map values to an array and sort by score (descending)
+  let sortedResults = Array.from(results.values())
     .sort((a, b) => b.score - a.score) // Sort by score descending
-    .slice(0, maxResults)
     .map(item => item.emoji); // Extract just the emoji object
 
-  return sortedResults;
+  // --- Filtering Step ---
+  // If the original query was an emoticon, filter out known text-style symbols
+  if (queryIsKnownEmoticon) {
+      sortedResults = sortedResults.filter(emoji => !knownTextSymbolsToFilter.has(emoji.emoji));
+  }
+
+  // Take top results
+  return sortedResults.slice(0, maxResults);
 } 
