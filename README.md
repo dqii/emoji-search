@@ -15,19 +15,14 @@ A simple TypeScript library for searching emojis based on names, keywords, emoti
 
 Run `ollama run llama3` (or your chosen model) in your terminal to download it.
 
-## Installation
+## Usage
 
 ```bash
 npm install @diqi/emoji-search
 ```
 
-## Usage
-
-After building the project (`npm run build`), you can import and use the `searchEmojis` function in your own Node.js/TypeScript projects.
-
 ```typescript
-// Assuming 'emoji-search' is installed or linked
-import { searchEmojis } from '@diqi/emoji-search'; // Adjust path/import based on your setupi
+import { searchEmojis } from '@diqi/emoji-search';
 
 // --- Examples ---
 
@@ -54,11 +49,7 @@ console.log('Cat Faces:', catEmojis.map(e => e.emoji));
 // Limit results
 const limitedFlags = searchEmojis('flag', 5);
 console.log('Flags (max 5):', limitedFlags.map(e => e.emoji));
-
 ```
-
-Remember to ensure the generated `emojis-expanded.json` file is available relative to where the compiled `search.js` code expects it (or adjust the path in `src/search.ts` if needed before building).
-
 
 ## Development
 
