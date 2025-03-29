@@ -73,18 +73,31 @@ Output ONLY the JSON object. Do not include any other text before or after the J
             response = requests.post(OLLAMA_API_URL, json=payload, timeout=REQUEST_TIMEOUT)
             response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
 
-            response_text = response.text.strip()
+            # Parse the outer Ollama response first
+            outer_response_json = response.json()
 
-            # Extract JSON from potential markdown code blocks
+            # Extract the inner JSON string from the 'response' field
+            response_text = outer_response_json.get('response', '').strip()
+
+            if not response_text:
+                print(f"\nWarning: Empty 'response' field received from Ollama for '{emoji_name}'. Raw: {outer_response_json}", file=sys.stderr)
+                # Consider retry or return None based on policy
+                if attempt < RETRY_ATTEMPTS:
+                    print(f"Retrying ({attempt + 1}/{RETRY_ATTEMPTS})...", file=sys.stderr)
+                    time.sleep(RETRY_DELAY)
+                    continue # Go to next attempt
+                else:
+                    return None
+
+            # The response_text *should* be the JSON we want, potentially still wrapped in ```json ... ```
             if response_text.startswith("```json"):
                 response_text = response_text[7:]
             if response_text.endswith("```"):
                 response_text = response_text[:-3]
+            response_text = response_text.strip()
 
-            # Handle potential escape sequences if necessary (though Ollama with format=json should be clean)
-            # response_text = response_text.replace('\\', '\').replace('\"', '"')
-
-            parsed_json = json.loads(response_text.strip())
+            # Now parse the inner JSON string
+            parsed_json = json.loads(response_text)
 
             # Basic validation of structure
             if all(k in parsed_json for k in ['keywords', 'emoticons', 'description', 'tags', 'country_code']):
@@ -180,20 +193,27 @@ def main():
 
             try:
                 metadata = future.result()
+                status = "Success"
                 if metadata:
                     enriched_emoji_data = {**original_emoji, **metadata} # Merge original and new data
                     enriched_emojis.append(enriched_emoji_data)
-                    # Print progress without newline
-                    print(f"\rProcessed: {processed_count}/{total_emojis} ({emoji_name}) - Success", end='', flush=True)
                 else:
                     errors_count += 1
-                    print(f"\rProcessed: {processed_count}/{total_emojis} ({emoji_name}) - Failed to get metadata", end='', flush=True)
+                    status = "Failed (No metadata)"
                     # Optionally add original emoji even if metadata failed:
                     # enriched_emojis.append(original_emoji)
 
+                # Calculate percentage
+                percentage = (processed_count / total_emojis) * 100
+                # Print updated progress without newline
+                print(f"\rProgress: [{percentage:>5.1f}%] ({processed_count}/{total_emojis}) - Last: {emoji_name} ({status})  ", end='', flush=True)
+
             except Exception as e:
                 errors_count += 1
-                print(f"\nError processing future result for '{emoji_name}': {e}", file=sys.stderr)
+                status = f"Failed (Error: {e})"
+                percentage = (processed_count / total_emojis) * 100
+                # Print error status on the same line if possible, or start a new line for clarity
+                print(f"\rProgress: [{percentage:>5.1f}%] ({processed_count}/{total_emojis}) - Last: {emoji_name} ({status})  ", file=sys.stderr, end='\n', flush=True)
 
 
     print(f"\n--- Processing Complete ---")
