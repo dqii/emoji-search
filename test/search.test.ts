@@ -12,8 +12,9 @@ describe('searchEmojis (with enriched data)', () => {
   });
 
   it('should find emoji by exact emoticon match', () => {
-    const resultsP = searchEmojis(':p');
+    const resultsP = searchEmojis(':P');
     expect(resultsP.length).toBeGreaterThan(1);
+    expect(resultsP.some(e => e.emoji === '😛')).toBe(true);
 
     const resultsHeart = searchEmojis('<3');
     expect(resultsHeart.length).toBeGreaterThan(1);
