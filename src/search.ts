@@ -1,27 +1,20 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { EnrichedEmoji, EmojiData } from './types';
+import allEmojisData from './emojis-expanded.json'; // Import the JSON directly
 
-// Load enriched emoji data from the JSON file
-const emojiFilePath = path.resolve(__dirname, '../../emojis-expanded.json'); // Load the new file
-let allEmojis: EmojiData = []; // Initialize as an empty array
+// Assign the imported data
+let allEmojis: EmojiData = [];
 
+// Basic validation after import
 try {
-  if (fs.existsSync(emojiFilePath)) {
-      const fileContent = fs.readFileSync(emojiFilePath, 'utf8');
-      allEmojis = JSON.parse(fileContent);
-      if (!Array.isArray(allEmojis)) {
-        console.error('Error: emojis-expanded.json does not contain a valid JSON array.');
-        allEmojis = []; // Reset to empty on invalid format
-      }
+  if (Array.isArray(allEmojisData)) {
+    allEmojis = allEmojisData as EmojiData;
   } else {
-    console.error(`Error: emojis-expanded.json not found at ${emojiFilePath}`);
-    console.error('Please run the metadata generation script first (e.g., python scripts/generate_metadata.py)');
-    // Optionally, you could fall back to the original emojis.json here if needed
+    console.error('Error: Imported emojis-expanded.json is not a valid JSON array.');
+    allEmojis = []; // Reset to empty on invalid format
   }
 } catch (error) {
-  console.error('Error loading or parsing emoji data:', error);
-  // Keep allEmojis as empty array on error
+  console.error('Error processing imported emoji data:', error);
+  allEmojis = []; // Reset to empty on error
 }
 
 /**
@@ -44,8 +37,8 @@ export function searchEmojis(query: string, maxResults: number = 50): EnrichedEm
 
     let matchFound = false;
 
-    // 1. Exact emoticon match
-    if (emoji.emoticons.includes(lowerCaseQuery)) {
+    // 1. Case-insensitive emoticon match
+    if (emoji.emoticons.some(emoticon => emoticon.toLowerCase() === lowerCaseQuery)) {
       matchFound = true;
     }
 
