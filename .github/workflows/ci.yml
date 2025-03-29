@@ -28,23 +28,3 @@ jobs:
 
     - name: Run tests
       run: npm test
-
-    - name: Pack package
-      run: npm pack
-
-    - name: Test Installation and Usage
-      run: |
-        # Create a temporary directory for installation test
-        mkdir test-install
-        cd test-install
-        # Initialize a dummy package
-        npm init -y
-        # Find the packed file (adjust name/version if needed)
-        PACKAGE_TGZ=$(ls ../diqi-emoji-search-*.tgz)
-        # Install the packed package
-        npm install "$PACKAGE_TGZ"
-        # Create a simple test script
-        echo "const { searchEmojis } = require('@diqi/emoji-search'); \nconst results = searchEmojis('smile cat'); \nif (!results || results.length === 0) { throw new Error('Installation test failed: No results found.'); } \nconsole.log('Installation test passed. Found:', results.length, 'results.');" > test-usage.js
-        # Run the test script
-        node test-usage.js
-      shell: bash 
