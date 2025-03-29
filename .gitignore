@@ -45,3 +45,5 @@ temp/
 
 # npmrc
 .npmrc
+
+emojis-cache.json
