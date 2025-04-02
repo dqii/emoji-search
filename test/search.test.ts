@@ -1,4 +1,4 @@
-import { searchEmojis } from '../src/search';
+import { searchEmojis } from '../src';
 
 describe('searchEmojis (with enriched data)', () => {
   it('should return an empty array for an empty query', () => {
