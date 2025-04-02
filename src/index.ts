@@ -70,9 +70,7 @@ function initializeCommonEmoticonMap() {
       const emojiObj = emojiStringToObjMap.get(emojiStr);
       if (emojiObj) {
         targetEmojis.push(emojiObj);
-      } else {
-        console.warn(`Target emoji "${emojiStr}" for emoticon "${emoticon}" not found in allEmojis.`);
-      }
+      } 
     }
     if (targetEmojis.length > 0) {
       resolvedCommonEmoticonMap.set(emoticon.toLowerCase(), targetEmojis);
